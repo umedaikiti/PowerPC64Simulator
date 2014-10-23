@@ -5,6 +5,7 @@ x86_64-linux-gnuのgccに依存するコードを含みます(ちなみに自分
 * signed型の算術右シフト
 * ビットフィールドの順序
 * short, int, long longを2, 4, 8バイトの整数型として扱っている
+
 他にもあるかも
 
 ### 実装の方針
@@ -22,159 +23,161 @@ make
 ./powerpc64sim <PPC64のアセンブリコード>
 ```
 #### コマンド一覧
-h | ヘルプの表示
+コマンド | 説明
+---------|-------------------
+h        | ヘルプの表示
 r <レジスタ番号> | GPRの中身を表示
-n | 次の命令を実行
-d | 全てのレジスタの中身を表示する
-q | 終了する
+n        | 次の命令を実行
+d        | 全てのレジスタの中身を表示する
+q        | 終了する
 
 ### 実装済み命令一覧
 #### 算術演算
-[x] addi
-[x] addis
-[x] add
-[x] subf
-[x] addic
-[ ] addic.
-[ ] subfic
-[x] addc
-[ ] subfc
-[x] adde
-[ ] subfe
-[ ] addme
-[ ] subfme
-[ ] addze
-[ ] subfze
-[ ] neg
-[ ] mulli
-[ ] mulhw
-[ ] mullw
-[ ] mulhwu
-[ ] divw
-[ ] divwu
-[ ] divwe
-[ ] divweu
-[ ] mulld
-[ ] mulhd
-[ ] mulhdu
-[ ] divd
-[ ] divdu
-[ ] divde
-[ ] divdeu
+- [x] addi
+- [x] addis
+- [x] add
+- [x] subf
+- [x] addic
+- [ ] addic.
+- [ ] subfic
+- [x] addc
+- [ ] subfc
+- [x] adde
+- [ ] subfe
+- [ ] addme
+- [ ] subfme
+- [ ] addze
+- [ ] subfze
+- [ ] neg
+- [ ] mulli
+- [ ] mulhw
+- [ ] mullw
+- [ ] mulhwu
+- [ ] divw
+- [ ] divwu
+- [ ] divwe
+- [ ] divweu
+- [ ] mulld
+- [ ] mulhd
+- [ ] mulhdu
+- [ ] divd
+- [ ] divdu
+- [ ] divde
+- [ ] divdeu
 #### 論理演算
-[x] andi
-[x] andis
-[x] ori
-[x] oris
-[x] xori
-[x] xoris
-[x] and
-[x] or
-[x] xor
-[x] nand
-[x] nor
-[x] eqv
-[x] andc
-[x] orc
-[x] extsb
-[x] extsh
-[x] cntlzw
-[x] cmpb
-[x] popcntb
-[x] popcntw
-[ ] prtyd
-[ ] prtyw
-[ ] extsw
-[ ] popcntd
-[ ] cntlzd
-[ ] bpermd
+- [x] andi
+- [x] andis
+- [x] ori
+- [x] oris
+- [x] xori
+- [x] xoris
+- [x] and
+- [x] or
+- [x] xor
+- [x] nand
+- [x] nor
+- [x] eqv
+- [x] andc
+- [x] orc
+- [x] extsb
+- [x] extsh
+- [x] cntlzw
+- [x] cmpb
+- [x] popcntb
+- [x] popcntw
+- [ ] prtyd
+- [ ] prtyw
+- [ ] extsw
+- [ ] popcntd
+- [ ] cntlzd
+- [ ] bpermd
 #### シフト/ローテート
-[ ] rlwinm
-[ ] rlwnm
-[ ] rlwimi
-[ ] rldicl
-[ ] rldicr
-[ ] rldic
-[ ] rldcl
-[ ] rldcr
-[ ] rldimi
-[ ] slw
-[x] srw
-[x] srawi
-[ ] sraw
-[ ] sld
-[ ] srd
-[ ] sradi
-[ ] srad
+- [ ] rlwinm
+- [ ] rlwnm
+- [ ] rlwimi
+- [ ] rldicl
+- [ ] rldicr
+- [ ] rldic
+- [ ] rldcl
+- [ ] rldcr
+- [ ] rldimi
+- [ ] slw
+- [x] srw
+- [x] srawi
+- [ ] sraw
+- [ ] sld
+- [ ] srd
+- [ ] sradi
+- [ ] srad
 #### 分岐命令
-[x] b
-[x] bc
-[x] bclr
-[x] bcctr
+- [x] b
+- [x] bc
+- [x] bclr
+- [x] bcctr
 #### ロード/ストア
-[x] stb
-[x] stbx
-[x] stbu
-[ ] stbux
-[x] sth
-[ ] sthx
-[x] sthu
-[ ] sthux
-[x] stw
-[ ] stwx
-[x] stwu
-[ ] stwux
-[x] std
-[ ] stdx
-[x] stdu
-[ ] stdux
-[x] lbz
-[x] lbzx
-[x] lbzu
-[x] lbzux
-[x] lhz
-[x] lhzx
-[x] lhzu
-[x] lhzux
-[x] lha
-[x] lhax
-[x] lhau
-[x] lhaux
-[x] lwz
-[x] lwzx
-[x] lwzu
-[x] lwzux
-[x] lwa
-[x] lwax
-[ ] lwaux
-[x] ld
-[ ] ldx
-[ ] ldu
-[ ] ldux
+- [x] stb
+- [x] stbx
+- [x] stbu
+- [ ] stbux
+- [x] sth
+- [ ] sthx
+- [x] sthu
+- [ ] sthux
+- [x] stw
+- [ ] stwx
+- [x] stwu
+- [ ] stwux
+- [x] std
+- [ ] stdx
+- [x] stdu
+- [ ] stdux
+- [x] lbz
+- [x] lbzx
+- [x] lbzu
+- [x] lbzux
+- [x] lhz
+- [x] lhzx
+- [x] lhzu
+- [x] lhzux
+- [x] lha
+- [x] lhax
+- [x] lhau
+- [x] lhaux
+- [x] lwz
+- [x] lwzx
+- [x] lwzu
+- [x] lwzux
+- [x] lwa
+- [x] lwax
+- [ ] lwaux
+- [x] ld
+- [ ] ldx
+- [ ] ldu
+- [ ] ldux
 #### Move To/From System Register Instructions
-[ ] mtspr
-[ ] mtcrf
-[ ] mfcr
-[ ] mtocrf
-[ ] mfocrf
-[ ] mcrxr
-[ ] mtdcrux
-[ ] mfdcrux
+- [ ] mtspr
+- [ ] mtcrf
+- [ ] mfcr
+- [ ] mtocrf
+- [ ] mfocrf
+- [ ] mcrxr
+- [ ] mtdcrux
+- [ ] mfdcrux
 #### 比較
-[x] cmpi
-[ ] cmp
-[ ] cmpli
-[ ] cmpl
+- [x] cmpi
+- [ ] cmp
+- [ ] cmpli
+- [ ] cmpl
 #### Condition Register Instructions
-[x] crand
-[x] crnand
-[x] cror
-[x] crxor
-[x] crnor
-[x] creqv
-[x] crandc
-[x] crorc
-[ ] mcrf
+- [x] crand
+- [x] crnand
+- [x] cror
+- [x] crxor
+- [x] crnor
+- [x] creqv
+- [x] crandc
+- [x] crorc
+- [ ] mcrf
 
 
 ### 実装済みレジスタ一覧
