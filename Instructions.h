@@ -140,6 +140,8 @@ int cmpli(ppc64_t *ppc, inst_t inst);
 
 int popcntb(ppc64_t *ppc, inst_t inst);
 int popcntw(ppc64_t *ppc, inst_t inst);
+int prtyd(ppc64_t *ppc, inst_t inst);
+int prtyw(ppc64_t *ppc, inst_t inst);
 
 int cntlzw(ppc64_t *ppc, inst_t inst);
 int extsh(ppc64_t *ppc, inst_t inst);

@@ -42,17 +42,17 @@ q        | 終了する
 - [x] add
 - [x] subf
 - [x] addic
-- [ ] addic.
-- [ ] subfic
+- [x] addic.
+- [x] subfic
 - [x] addc
-- [ ] subfc
+- [x] subfc
 - [x] adde
-- [ ] subfe
-- [ ] addme
-- [ ] subfme
-- [ ] addze
-- [ ] subfze
-- [ ] neg
+- [x] subfe
+- [x] addme
+- [x] subfme
+- [x] addze
+- [x] subfze
+- [x] neg
 - [ ] mulli
 - [ ] mulhw
 - [ ] mullw
@@ -90,8 +90,8 @@ q        | 終了する
 - [x] cmpb
 - [x] popcntb
 - [x] popcntw
-- [ ] prtyd
-- [ ] prtyw
+- [x] prtyd
+- [x] prtyw
 - [ ] extsw
 - [ ] popcntd
 - [ ] cntlzd
@@ -107,7 +107,7 @@ q        | 終了する
 - [ ] rldcl
 - [ ] rldcr
 - [ ] rldimi
-- [ ] slw
+- [x] slw
 - [x] srw
 - [x] srawi
 - [ ] sraw

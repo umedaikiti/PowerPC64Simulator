@@ -161,6 +161,15 @@ int addic(ppc64_t *ppc, inst_t inst)
 	return RET_SUCCESS;
 }
 
+int subfic(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long ra = ppc->regs.GPR[inst.dform.ra];
+	unsigned long long si = EXTS16(inst.dform.imm);
+	ppc->regs.XER.field.ca = CA(~ra, si, 1);
+	ppc->regs.GPR[inst.dform.rt] = ~ra + si + 1;
+	return RET_SUCCESS;
+}
+
 /* xform template
 int (ppc64_t *ppc, inst_t inst){
 	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
@@ -174,64 +183,85 @@ int (ppc64_t *ppc, inst_t inst){
 }
 */
 
-int adde(ppc64_t *ppc, inst_t inst){
-	unsigned long long ra, rb, rt;
-	ra = ppc->regs.GPR[inst.xoform.ra];
-	rb = ppc->regs.GPR[inst.xoform.rb];
-	rt = ra + rb + ppc->regs.XER.field.ca;
+static int FullAdderXO(ppc64_t *ppc, inst_t inst, unsigned long long a, unsigned long long b, unsigned long long carryin)
+{
+	unsigned long long rt;
+	rt = a + b + carryin;
 	ppc->regs.GPR[inst.xoform.rt] = rt;
-	ppc->regs.XER.field.ca = CA(ra, rb, ppc->regs.XER.field.ca);
+	ppc->regs.XER.field.ca = CA(a, b, carryin);
 	if(inst.xoform.oe){
-		ppc->regs.XER.field.so |= ppc->regs.XER.field.ov = OV(ra, rb, rt);
+		ppc->regs.XER.field.so |= ppc->regs.XER.field.ov = OV(a, b, rt);
 	}
 	if(inst.xoform.rc){
 		ppc->regs.CR.field.cr0 = condition(ppc, rt, 0);
 	}
 	return RET_SUCCESS;
 }
-int addc(ppc64_t *ppc, inst_t inst)
-{
-	unsigned long long ra, rb, rt;
+
+int adde(ppc64_t *ppc, inst_t inst){
+	unsigned long long ra, rb;
 	ra = ppc->regs.GPR[inst.xoform.ra];
 	rb = ppc->regs.GPR[inst.xoform.rb];
-	rt = ra + rb;
-	ppc->regs.GPR[inst.xoform.rt] = rt;
-	ppc->regs.XER.field.ca = CA(ra, rb, 0);
-	if(inst.xoform.oe){
-		ppc->regs.XER.field.so |= ppc->regs.XER.field.ov = OV(ra, rb, rt);
-	}
-	if(inst.xoform.rc){
-		ppc->regs.CR.field.cr0 = condition(ppc, rt, 0);
-	}
-	return RET_SUCCESS;
+	return FullAdderXO(ppc, inst, ra, rb, ppc->regs.XER.field.ca);
+}
+
+int addc(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long ra, rb;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	rb = ppc->regs.GPR[inst.xoform.rb];
+	return FullAdderXO(ppc, inst, ra, rb, 0);
 }
 int subfc(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long ra, rb;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	rb = ppc->regs.GPR[inst.xoform.rb];
+	return FullAdderXO(ppc, inst, ~ra, rb, 1);
 }
 int subfe(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long ra, rb;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	rb = ppc->regs.GPR[inst.xoform.rb];
+	return FullAdderXO(ppc, inst, ~ra, rb, ppc->regs.XER.field.ca);
 }
 int addme(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long ra;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	return FullAdderXO(ppc, inst, ra, -1ll, ppc->regs.XER.field.ca);
 }
 int subfme(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long ra;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	return FullAdderXO(ppc, inst, ~ra, -1ll, ppc->regs.XER.field.ca);
 }
 int addze(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long ra;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	return FullAdderXO(ppc, inst, ra, 0, ppc->regs.XER.field.ca);
 }
 int subfze(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long ra;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	return FullAdderXO(ppc, inst, ~ra, 0, ppc->regs.XER.field.ca);
 }
 int neg(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long ra, rt;
+	ra = ppc->regs.GPR[inst.xoform.ra];
+	rt = ~ra + 1;
+	if(inst.xoform.oe){
+		ppc->regs.XER.field.so |= ppc->regs.XER.field.ov = (ra == (1ull << 63) ? 1 : 0);
+	}
+	if(inst.xoform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, rt, 0);
+	}
+	return RET_SUCCESS;
 }
 int and(ppc64_t *ppc, inst_t inst){
 	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
@@ -1348,3 +1378,21 @@ int divdeu(ppc64_t *ppc, inst_t inst)
 	return RET_NOTIMPLEMENTED;
 }
 
+int prtyd(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	unsigned long long ra = rs ^ (rs >> 32);
+	ra = ra ^ (ra >> 16);
+	ra = ra ^ (ra >> 8);
+	ra &= 1;
+	ppc->regs.GPR[inst.xform.ra] = ra;
+	return RET_SUCCESS;
+}
+int prtyw(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	unsigned long long ra = rs ^ (rs >> 8);
+	ra = ra ^ (ra >> 16);
+	ra &= 0x0000000100000001;
+	return RET_NOTIMPLEMENTED;
+}
