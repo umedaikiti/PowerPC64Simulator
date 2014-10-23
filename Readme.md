@@ -15,13 +15,16 @@ x86_64-linux-gnuのgccに依存するコードを含みます(ちなみに自分
 * 例外処理、メモリアクセスの際のアドレス変換、特権モードなども(今のところの予定では)実装しない
 
 ### 使い方
+
 #### アセンブリコードの作り方
 そのうち書く
+
 #### シミュレーターの使い方
 ```
 make
 ./powerpc64sim <PPC64のアセンブリコード>
 ```
+
 #### コマンド一覧
 コマンド | 説明
 ---------|-------------------
@@ -32,6 +35,7 @@ d        | 全てのレジスタの中身を表示する
 q        | 終了する
 
 ### 実装済み命令一覧
+
 #### 算術演算
 - [x] addi
 - [x] addis
@@ -64,6 +68,7 @@ q        | 終了する
 - [ ] divdu
 - [ ] divde
 - [ ] divdeu
+
 #### 論理演算
 - [x] andi
 - [x] andis
@@ -91,6 +96,7 @@ q        | 終了する
 - [ ] popcntd
 - [ ] cntlzd
 - [ ] bpermd
+
 #### シフト/ローテート
 - [ ] rlwinm
 - [ ] rlwnm
@@ -109,11 +115,13 @@ q        | 終了する
 - [ ] srd
 - [ ] sradi
 - [ ] srad
+
 #### 分岐命令
 - [x] b
 - [x] bc
 - [x] bclr
 - [x] bcctr
+
 #### ロード/ストア
 - [x] stb
 - [x] stbx
@@ -154,6 +162,7 @@ q        | 終了する
 - [ ] ldx
 - [ ] ldu
 - [ ] ldux
+
 #### Move To/From System Register Instructions
 - [ ] mtspr
 - [ ] mtcrf
@@ -163,11 +172,13 @@ q        | 終了する
 - [ ] mcrxr
 - [ ] mtdcrux
 - [ ] mfdcrux
+
 #### 比較
 - [x] cmpi
 - [ ] cmp
 - [ ] cmpli
 - [ ] cmpl
+
 #### Condition Register Instructions
 - [x] crand
 - [x] crnand
