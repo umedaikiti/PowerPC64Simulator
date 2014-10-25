@@ -92,17 +92,17 @@ q        | 終了する
 - [x] popcntw
 - [x] prtyd
 - [x] prtyw
-- [ ] extsw
-- [ ] popcntd
-- [ ] cntlzd
+- [x] extsw
+- [x] popcntd
+- [x] cntlzd
 - [ ] bpermd
 
 #### シフト/ローテート
 - [ ] rlwinm
 - [ ] rlwnm
 - [ ] rlwimi
-- [ ] rldicl
-- [ ] rldicr
+- [x] rldicl
+- [x] rldicr
 - [ ] rldic
 - [ ] rldcl
 - [ ] rldcr
@@ -111,8 +111,8 @@ q        | 終了する
 - [x] srw
 - [x] srawi
 - [ ] sraw
-- [ ] sld
-- [ ] srd
+- [x] sld
+- [x] srd
 - [ ] sradi
 - [ ] srad
 
@@ -166,7 +166,7 @@ q        | 終了する
 #### Move To/From System Register Instructions
 - [ ] mtspr
 - [ ] mtcrf
-- [ ] mfcr
+- [x] mfcr
 - [ ] mtocrf
 - [ ] mfocrf
 - [ ] mcrxr
@@ -175,9 +175,9 @@ q        | 終了する
 
 #### 比較
 - [x] cmpi
-- [ ] cmp
-- [ ] cmpli
-- [ ] cmpl
+- [x] cmp
+- [x] cmpli
+- [x] cmpl
 
 #### Condition Register Instructions
 - [x] crand
@@ -199,4 +199,8 @@ q        | 終了する
 * XER(Fixed-Point Exception Register)
 
 ### 補足(今後変更する可能性が高いことなど)
-
+* break pointの設定、continueコマンドなどを実装したい。
+* メモリの中身の表示もさせたい
+* エントリーポイントは0(そのうち何とかしたい)
+* 掛け算割り算は面倒なので実装しないかも
+* ニーモニックの表示と命令の実行は別なので、実行できてもmnemonic unknownのことがある

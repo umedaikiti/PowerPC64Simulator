@@ -206,6 +206,8 @@ int Execute(ppc64_t *ppc, inst_t instruction)
 */
 	case 19:
 		return opcd19(ppc, instruction);
+	case 30:
+		return opcd30(ppc, instruction);
 	case 31:
 		return opcd31(ppc, instruction);
 	case 58:

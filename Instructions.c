@@ -19,6 +19,21 @@ int (ppc64_t *ppc, inst_t inst){
 }
 */
 
+static inline unsigned long long rotl64(unsigned long long x, unsigned int y)
+{
+	if(y == 0){
+		return x;
+	}
+	else{
+		return (x << y) | (x >> (64 - y));
+	}
+}
+static inline unsigned long long rotl32(unsigned int x, unsigned int y)
+{
+	unsigned long long xx = x | (((unsigned long long)x) << 32);
+	return rotl64(xx, y);
+}
+
 static inline unsigned int carry(unsigned long long a, unsigned long long b, unsigned int c)
 {
 	unsigned long long al, ah, bl, bh;
@@ -406,6 +421,7 @@ int cmpb(ppc64_t *ppc, inst_t inst)
 #define MASK4 (0x0f0f0f0f0f0f0f0f)
 #define MASK8 (0x00ff00ff00ff00ff)
 #define MASK16 (0x0000ffff0000ffff)
+#define MASK32 (0x00000000ffffffff)
 
 int popcntb(ppc64_t *ppc, inst_t inst)
 {
@@ -444,9 +460,48 @@ int cmpi(ppc64_t *ppc, inst_t inst)
 	return RET_SUCCESS;
 }
 
+int cmp(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long ra = ppc->regs.GPR[inst.xform.ra];
+	unsigned long long rb = ppc->regs.GPR[inst.xform.rb];
+	unsigned int bf = inst.xform.rt >> 2;
+	unsigned int l = inst.xform.rt & 1;
+	long long a = l == 0 ? EXTS32(ra & 0xFFFFFFFF) : (long long)ra;
+	long long b = l == 0 ? EXTS32(rb & 0xFFFFFFFF) : (long long)rb;
+	unsigned int c = condition(ppc, a, b);
+	setCR(ppc, bf, c);
+	return RET_SUCCESS;
+}
+
 int cmpli(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int bf = inst.dform.rt >> 2;
+	unsigned int l = inst.dform.rt & 1;
+	unsigned long long ra = ppc->regs.GPR[inst.dform.ra];
+	unsigned long long a = l == 0 ? (ra & 0xFFFFFFFF) : ra;
+	unsigned long long ui = inst.dform.imm;
+	unsigned int c = ppc->regs.XER.field.so;
+	if(a < ui) c |= 0x8;
+	else if(a > ui) c |= 0x4;
+	else c |= 0x2;
+	setCR(ppc, bf, c);
+	return RET_SUCCESS;
+}
+
+int cmpl(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long ra = ppc->regs.GPR[inst.xform.ra];
+	unsigned long long rb = ppc->regs.GPR[inst.xform.rb];
+	unsigned int bf = inst.xform.rt >> 2;
+	unsigned int l = inst.xform.rt & 1;
+	unsigned long long a = l == 0 ? (ra & 0xFFFFFFFF) : ra;
+	unsigned long long b = l == 0 ? (rb & 0xFFFFFFFF) : rb;
+	unsigned int c = ppc->regs.XER.field.so;
+	if(a < b) c |= 0x8;
+	else if(a > b) c |= 0x4;
+	else c |= 0x2;
+	setCR(ppc, bf, c);
+	return RET_SUCCESS;
 }
 
 int slw(ppc64_t *ppc, inst_t inst)
@@ -538,13 +593,33 @@ int mtspr(ppc64_t *ppc, inst_t inst)
 	return RET_SUCCESS;
 }
 
+int mfspr(ppc64_t *ppc, inst_t inst)
+{
+	unsigned int spr = inst.xfxform.r;
+	unsigned int n = ((spr & 0x1f) << 5) | (spr >> 5);
+	switch(n){
+	case 1:
+		ppc->regs.GPR[inst.xfxform.rt] = ppc->regs.XER.raw;
+		break;
+	case 8:
+		ppc->regs.GPR[inst.xfxform.rt] = ppc->regs.LR;
+		break;
+	case 9:
+		ppc->regs.GPR[inst.xfxform.rt] = ppc->regs.CTR;
+		break;
+	default:
+		return RET_NOTIMPLEMENTED;
+	}
+	return RET_SUCCESS;
+}
 int mtcrf(ppc64_t *ppc, inst_t inst)
 {
 	return RET_NOTIMPLEMENTED;
 }
 int mfcr(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	ppc->regs.GPR[inst.xfxform.rt] = ppc->regs.CR.raw;
+	return RET_SUCCESS;
 }
 int mtocrf(ppc64_t *ppc, inst_t inst)
 {
@@ -823,6 +898,16 @@ int opcd31(ppc64_t *ppc, inst_t inst)
 		return popcntb(ppc, inst);
 	case OPCD31_X_POPCNTW:
 		return popcntw(ppc, inst);
+	case OPCD31_X_PRTYD:
+		return prtyd(ppc, inst);
+	case OPCD31_X_PRTYW:
+		return prtyw(ppc, inst);
+	case OPCD31_X_EXTSW:
+		return extsw(ppc, inst);
+	case OPCD31_X_POPCNTD:
+		return popcntd(ppc, inst);
+	case OPCD31_X_CNTLZD:
+		return cntlzd(ppc, inst);
 	case OPCD31_X_SLW:
 		return slw(ppc, inst);
 	case OPCD31_X_SRW:
@@ -831,6 +916,24 @@ int opcd31(ppc64_t *ppc, inst_t inst)
 		return sraw(ppc, inst);
 	case OPCD31_X_SRAWI:
 		return srawi(ppc, inst);
+	case OPCD31_X_SLD:
+		return sld(ppc, inst);
+	case OPCD31_X_SRD:
+		return srd(ppc, inst);
+	case OPCD31_X_MFCR:
+		return mfcr(ppc, inst);
+	case OPCD31_X_CMP:
+		return cmp(ppc, inst);
+	case OPCD31_X_CMPL:
+		return cmpl(ppc, inst);
+	default:
+		break;
+	}
+	switch(inst.xfxform.xo){
+	case OPCD31_XFX_MTSPR:
+		return mtspr(ppc, inst);
+	case OPCD31_XFX_MFSPR:
+		return mfspr(ppc, inst);
 	default:
 		break;
 	}
@@ -1250,25 +1353,86 @@ int ldux(ppc64_t *ppc, inst_t inst)
 	return RET_NOTIMPLEMENTED;
 }
 
+static inline unsigned long long mask(unsigned int x, unsigned int y)
+{
+	unsigned long long m1 = x == 0 ? 0xFFFFFFFFFFFFFFFF : (1ull << (64 - x)) - 1;
+	unsigned long long m2 = (1ull << (63 - y)) - 1;
+	if(x <= y){
+		return m1 & ~m2;
+	}
+	else{
+		return m1 | ~m2;
+	}
+}
+//上位32bitは0になる?
+//http://www.super-computing.org/~ysd/yuke/ppc64.html
 int rlwinm(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = inst.mform.rb;
+	unsigned long long rs = ppc->regs.GPR[inst.mform.rs];
+	unsigned long long r = rotl32(rs & 0xFFFFFFFF, n);
+	unsigned long long m = mask(inst.mform.mb+32, inst.mform.me+32);
+	unsigned long long result = r & m;
+	if(inst.mform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	ppc->regs.GPR[inst.mform.ra] = result;
+	return RET_SUCCESS;
 }
 int rlwnm(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = ppc->regs.GPR[inst.mform.rb] & 0x1F;
+	unsigned long long rs = ppc->regs.GPR[inst.mform.rs];
+	unsigned long long r = rotl32(rs & 0xFFFFFFFF, n);
+	unsigned long long m = mask(inst.mform.mb+32, inst.mform.me+32);
+	unsigned long long result = r & m;
+	if(inst.mform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	ppc->regs.GPR[inst.mform.ra] = result;
+	return RET_SUCCESS;
 }
 int rlwimi(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = inst.mform.rb;
+	unsigned long long rs = ppc->regs.GPR[inst.mform.rs];
+	unsigned long long r = rotl32(rs & 0xFFFFFFFF, n);
+	unsigned long long m = mask(inst.mform.mb+32, inst.mform.me+32);
+	unsigned long long ra = ppc->regs.GPR[inst.mform.ra];
+	unsigned long long result = (r & m) | (ra & ~m);
+	if(inst.mform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	ppc->regs.GPR[inst.mform.ra] = result;
+	return RET_SUCCESS;
 }
 int rldicl(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
+	unsigned int b = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
+	unsigned long long m = b == 0 ? ~0ull : ((1ull << (64-b)) - 1);
+	unsigned long long rs = ppc->regs.GPR[inst.mdform.rs];
+	unsigned long long r = rotl64(rs, n);
+	unsigned long long result = r & m;
+	ppc->regs.GPR[inst.mdform.ra] = result;
+	if(inst.mdform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
 }
 int rldicr(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
+	unsigned int e = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
+	unsigned long long m = ~((1ull << (63 - e)) - 1);
+	unsigned long long rs = ppc->regs.GPR[inst.mdform.rs];
+	unsigned long long r = rotl64(rs, n);
+	unsigned long long result = r & m;
+	ppc->regs.GPR[inst.mdform.ra] = result;
+	if(inst.mdform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
 }
 int rldic(ppc64_t *ppc, inst_t inst)
 {
@@ -1395,4 +1559,73 @@ int prtyw(ppc64_t *ppc, inst_t inst)
 	ra = ra ^ (ra >> 16);
 	ra &= 0x0000000100000001;
 	return RET_NOTIMPLEMENTED;
+}
+int extsw(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	unsigned long long result = EXTS32(rs & 0xFFFFFFFF);
+	ppc->regs.GPR[inst.xform.ra] = result;
+	if(inst.xform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
+}
+int popcntd(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	unsigned long long result;
+	result = (rs & MASK1) + ((rs >> 1) & MASK1);
+	result = (result & MASK2) + ((result >> 2) & MASK2);
+	result = (result & MASK4) + ((result >> 4) & MASK4);
+	result = (result & MASK8) + ((result >> 8) & MASK8);
+	result = (result & MASK16) + ((result >> 16) & MASK16);
+	result = (result & MASK32) + ((result >> 32) & MASK32);
+	ppc->regs.GPR[inst.xform.ra] = result;
+	return RET_SUCCESS;
+}
+int cntlzd(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	long long result = 63;
+	for(;result>=0;result--){
+		if((rs >> result) & 1) break;
+	}
+	result = 63 - result;
+	ppc->regs.GPR[inst.xform.ra] = result;
+	if(inst.xform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
+}
+
+int sld(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	unsigned long long rb = ppc->regs.GPR[inst.xform.rb];
+	unsigned int n = rb & 0x3F;
+	unsigned long long result = rs << n;
+	if((rb >> 6) & 1){
+		result = 0;
+	}
+	ppc->regs.GPR[inst.xform.ra] = result;
+	if(inst.xform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
+}
+
+int srd(ppc64_t *ppc, inst_t inst)
+{
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	unsigned long long rb = ppc->regs.GPR[inst.xform.rb];
+	unsigned int n = rb & 0x3F;
+	unsigned long long result = rs >> n;
+	if((rb >> 6) & 1){
+		result = 0;
+	}
+	ppc->regs.GPR[inst.xform.ra] = result;
+	if(inst.xform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
 }

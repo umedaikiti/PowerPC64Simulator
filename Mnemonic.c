@@ -195,6 +195,14 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		case OPCD31_X_SRW:
 		case OPCD31_X_SRAW:
 		case OPCD31_X_SRAWI:
+		case OPCD31_X_CMP:
+		case OPCD31_X_CMPL:
+		default:
+			break;
+		}
+		switch(inst.xfxform.xo){
+		case OPCD31_X_MTCRF:
+		case OPCD31_X_MFCR:
 		default:
 			break;
 		}
@@ -239,11 +247,32 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		}
 	case SC:
 		return snprintf(buf, n, "sc\t0x%x", inst.scform.lev);
+	case 30:
+		switch(inst.mdform.xo){
+		case OPCD30_MD_RLDICR:
+		case OPCD30_MD_RLDICL:
+		case OPCD30_MD_RLDIC:
+		case OPCD30_MD_RLDIMI:
+		default:
+			break;
+		}
+		switch(inst.mdsform.xo){
+		case OPCD30_MDS_RLDCL:
+		case OPCD30_MDS_RLDCR:
+		default:
+			break;
+		}
+		return -1;
+	case CMPI:
+	{
+		unsigned int bf = inst.dform.rt >> 2;
+		unsigned int l = inst.dform.rt & 1;
+		short si = inst.dform.imm;
+		return snprintf(buf, n, "cmpi\t%u, %u, %u, %d", bf, l, inst.dform.ra, si);
+	}
+	case CMPLI:
 	case LMW:
 	case STMW:
-	case 30:
-	case CMPI:
-	case CMPLI:
 	case RLWINM:
 	case RLWNM:
 	case RLWIMI:

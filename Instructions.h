@@ -76,11 +76,17 @@
 #define OPCD31_X_POPCNTB (122)
 #define OPCD31_X_POPCNTW (378)
 #define OPCD31_X_PRTYD (186)
+#define OPCD31_X_PRTYW (154)
+#define OPCD31_X_EXTSW (986)
+#define OPCD31_X_POPCNTD (506)
+#define OPCD31_X_CNTLZD (58)
 
 #define OPCD31_X_SLW (24)
 #define OPCD31_X_SRW (536)
 #define OPCD31_X_SRAWI (824)
 #define OPCD31_X_SRAW (792)
+#define OPCD31_X_SLD (27)
+#define OPCD31_X_SRD (539)
 
 #define OPCD31_X_STBX (215)
 #define OPCD31_X_STBUX (247)
@@ -91,6 +97,14 @@
 #define OPCD31_X_STDX (149)
 #define OPCD31_X_STDUX (181)
 
+#define OPCD31_X_MTCRF (144)
+#define OPCD31_X_MFCR (19)
+
+#define OPCD31_X_CMP (0)
+#define OPCD31_X_CMPL (32)
+
+#define OPCD31_XFX_MTSPR (467)
+#define OPCD31_XFX_MFSPR (339)
 
 //#define OPCD31_X_ ()
 //#define OPCD31_XO_ ()
@@ -136,12 +150,17 @@ int extsb(ppc64_t *ppc, inst_t inst);
 
 int cmpb(ppc64_t *ppc, inst_t inst);
 int cmpi(ppc64_t *ppc, inst_t inst);
+int cmp(ppc64_t *ppc, inst_t inst);
 int cmpli(ppc64_t *ppc, inst_t inst);
+int cmpl(ppc64_t *ppc, inst_t inst);
 
 int popcntb(ppc64_t *ppc, inst_t inst);
 int popcntw(ppc64_t *ppc, inst_t inst);
 int prtyd(ppc64_t *ppc, inst_t inst);
 int prtyw(ppc64_t *ppc, inst_t inst);
+int extsw(ppc64_t *ppc, inst_t inst);
+int popcntd(ppc64_t *ppc, inst_t inst);
+int cntlzd(ppc64_t *ppc, inst_t inst);
 
 int cntlzw(ppc64_t *ppc, inst_t inst);
 int extsh(ppc64_t *ppc, inst_t inst);
@@ -167,6 +186,8 @@ int rldic(ppc64_t *ppc, inst_t inst);
 int rldcl(ppc64_t *ppc, inst_t inst);
 int rldcr(ppc64_t *ppc, inst_t inst);
 int rldimi(ppc64_t *ppc, inst_t inst);
+int sld(ppc64_t *ppc, inst_t inst);
+int srd(ppc64_t *ppc, inst_t inst);
 
 int stb(ppc64_t *ppc, inst_t inst);
 int stbx(ppc64_t *ppc, inst_t inst);
@@ -219,6 +240,7 @@ int srw(ppc64_t *ppc, inst_t inst);
 int srawi(ppc64_t *ppc, inst_t inst);
 int sraw(ppc64_t *ppc, inst_t inst);
 int mtspr(ppc64_t *ppc, inst_t inst);
+int mfspr(ppc64_t *ppc, inst_t inst);
 int mtcrf(ppc64_t *ppc, inst_t inst);
 int mfcr(ppc64_t *ppc, inst_t inst);
 int mtocrf(ppc64_t *ppc, inst_t ins);
