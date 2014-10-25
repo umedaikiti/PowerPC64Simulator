@@ -165,6 +165,7 @@ q        | 終了する
 
 #### Move To/From System Register Instructions
 - [ ] mtspr
+- [ ] mfspr
 - [ ] mtcrf
 - [x] mfcr
 - [ ] mtocrf
