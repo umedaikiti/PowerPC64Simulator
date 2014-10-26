@@ -97,6 +97,19 @@
 #define OPCD31_X_STDX (149)
 #define OPCD31_X_STDUX (181)
 
+#define OPCD31_X_LBZX (87)
+#define OPCD31_X_LBZUX (119)
+#define OPCD31_X_LHZX (279)
+#define OPCD31_X_LHZUX (311)
+#define OPCD31_X_LHAX (343)
+#define OPCD31_X_LHAUX (375)
+#define OPCD31_X_LWZX (23)
+#define OPCD31_X_LWZUX (55)
+#define OPCD31_X_LWAX (341)
+#define OPCD31_X_LWAUX (373)
+#define OPCD31_X_LDX (21)
+#define OPCD31_X_LDUX (53)
+
 #define OPCD31_X_MTCRF (144)
 #define OPCD31_X_MFCR (19)
 

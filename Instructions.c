@@ -926,6 +926,46 @@ int opcd31(ppc64_t *ppc, inst_t inst)
 		return cmp(ppc, inst);
 	case OPCD31_X_CMPL:
 		return cmpl(ppc, inst);
+	case OPCD31_X_STBX:
+		return stbx(ppc, inst);
+	case OPCD31_X_STBUX:
+		return stbux(ppc, inst);
+	case OPCD31_X_STHX:
+		return sthx(ppc, inst);
+	case OPCD31_X_STHUX:
+		return sthux(ppc, inst);
+	case OPCD31_X_STWX:
+		return stwx(ppc, inst);
+	case OPCD31_X_STWUX:
+		return stwux(ppc, inst);
+	case OPCD31_X_STDX:
+		return stdx(ppc, inst);
+	case OPCD31_X_STDUX:
+		return stdux(ppc, inst);
+	case OPCD31_X_LBZX:
+		return lbzx(ppc, inst);
+	case OPCD31_X_LBZUX:
+		return lbzux(ppc, inst);
+	case OPCD31_X_LHZX:
+		return lhzx(ppc, inst);
+	case OPCD31_X_LHZUX:
+		return lhzux(ppc, inst);
+	case OPCD31_X_LHAX:
+		return lhax(ppc, inst);
+	case OPCD31_X_LHAUX:
+		return lhaux(ppc, inst);
+	case OPCD31_X_LWZX:
+		return lwzx(ppc, inst);
+	case OPCD31_X_LWZUX:
+		return lwzux(ppc, inst);
+	case OPCD31_X_LWAX:
+		return lwax(ppc, inst);
+	case OPCD31_X_LWAUX:
+		return lwaux(ppc, inst);
+	case OPCD31_X_LDX:
+		return ldx(ppc, inst);
+	case OPCD31_X_LDUX:
+		return ldux(ppc, inst);
 	default:
 		break;
 	}
