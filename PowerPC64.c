@@ -92,6 +92,7 @@ const char *help =
 		"r <num>: print GPR[<num>]\n"
 		"n: execute next instruction\n"
 		"d: dump all registers\n"
+		"m <size> <address>: print contents of memory\n"
 		"q: quit\n";
 
 //ユーザーからの入力を受け取り、応答する
@@ -118,6 +119,28 @@ int Command(ppc64_t *ppc, const char* cmd)
 	return 0;
 	case 'n':
 		return 1;
+	case 'm':
+	{
+		unsigned int size, i;
+		unsigned long long address;
+		int ret;
+		if((ret = sscanf(cmd, "m %u %llx", &size, &address)) != 2){
+			printf("sscanf error: %d\n", ret);
+			return 0;
+		}
+		for(i=0;i<size;i++){
+			unsigned char c;
+			if(ReadMemory1(ppc, address+i, &c) != 0){
+				printf("\nMemory Read Error @0x%llx\n", address+i);
+				return 0;
+			}
+			if(i % 8 == 0){
+				printf("0x%llx: ", address + i);
+			}
+			printf("%02x%c", c, (i % 8 == 7) || (i == size - 1) ? '\n' : ' ');
+		}
+		return 0;
+	}
 	case 'd':
 		PrintRegisters(ppc);
 		return 0;
