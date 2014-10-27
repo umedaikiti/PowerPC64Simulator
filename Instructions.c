@@ -1559,19 +1559,58 @@ int rldicr(ppc64_t *ppc, inst_t inst)
 }
 int rldic(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
+	unsigned int b = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
+	unsigned long long m = mask(b, 63 - n);
+	unsigned long long rs = ppc->regs.GPR[inst.mdform.rs];
+	unsigned long long r = rotl64(rs, n);
+	unsigned long long result = r & m;
+	ppc->regs.GPR[inst.mdform.ra] = result;
+	if(inst.mdform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
 }
 int rldcl(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = ppc->regs.GPR[inst.mdsform.rb] & 0x3F;
+	unsigned long long r = rotl64(ppc->regs.GPR[inst.mdsform.rs], n);
+	unsigned int b = (inst.mdsform.mb >> 1) | ((inst.mdsform.mb & 1) << 5);
+	unsigned long long m = mask(b, 63);
+	unsigned long long result = r & m;
+	ppc->regs.GPR[inst.mdsform.ra] = result;
+	if(inst.mdsform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
 }
 int rldcr(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = ppc->regs.GPR[inst.mdsform.rb] & 0x3F;
+	unsigned long long r = rotl64(ppc->regs.GPR[inst.mdsform.rs], n);
+	unsigned int e = (inst.mdsform.mb >> 1) | ((inst.mdsform.mb & 1) << 5);
+	unsigned long long m = mask(0, e);
+	unsigned long long result = r & m;
+	ppc->regs.GPR[inst.mdsform.ra] = result;
+	if(inst.mdsform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
 }
 int rldimi(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned int n = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
+	unsigned long long rs = ppc->regs.GPR[inst.mdform.rs];
+	unsigned long long r = rotl64(rs, n);
+	unsigned int b = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
+	unsigned long long m = mask(b, 63 - n);
+	unsigned long long ra = ppc->regs.GPR[inst.mdform.ra];
+	unsigned long long result = (r & m) | (ra & ~m);
+	ppc->regs.GPR[inst.mdform.ra] = result;
+	if(inst.mdform.rc){
+		ppc->regs.CR.field.cr0 = condition(ppc, result, 0);
+	}
+	return RET_SUCCESS;
 }
 
 int opcd30(ppc64_t *ppc, inst_t inst)
