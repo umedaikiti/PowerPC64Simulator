@@ -5,7 +5,7 @@
 
 #define EXTS32(x) (((long long)(int)(x) << 32) >> 32)
 #define EXTS16(x) (((long long)(short)(x) << 48) >> 48)
-#define EXTS8(x) (((long long)(x) << 56) >> 56)
+#define EXTS8(x) (((long long)(char)(x) << 56) >> 56)
 #define MSB(x) (((unsigned long long)(x)) >> 63)
 #define OV(a,b,c) ((MSB(a) ^ MSB(c)) & (MSB(b) ^ MSB(c)))
 #define CA(a, b, c) carry(a, b, c)

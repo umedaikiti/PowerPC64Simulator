@@ -22,6 +22,7 @@ int InitPPC(ppc64_t *ppc, const char *filename)
 	struct stat buf;
 	int fd;
 	unsigned char *p;
+	unsigned long long entrypoint = 0x10000000;
 	if(stat(filename, &buf) == -1) return -1;
 	fd = open(filename, O_RDONLY);
 	if(fd < 0) return -1;
@@ -31,10 +32,9 @@ int InitPPC(ppc64_t *ppc, const char *filename)
 	close(fd);
 
 	memset(ppc, 0, sizeof(ppc64_t));
-	WriteMemory(ppc, 0, p, buf.st_size);
-//	WriteMemory(ppc, entrypoint, p, buf.st_size);
+	WriteMemory(ppc, entrypoint, p, buf.st_size);
 	free(p);
-//	ppc->cia = entrypoint;
+	ppc->cia = entrypoint;
 	ppc->nia = ppc->cia + 4;
 	return 0;
 }
