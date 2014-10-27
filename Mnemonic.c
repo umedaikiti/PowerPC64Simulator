@@ -70,7 +70,8 @@ static inline int GetMnemonicMDFormRARSSHMBRc(char *buf, unsigned int n, inst_t 
 {
 	char *suf = inst.mdform.rc ? "." : "";
 	unsigned int sh = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
-	return snprintf(buf, n, "%s%s\t%u, %u, %u, %u", str, suf, inst.mdform.ra, inst.mdform.rs, sh, inst.mdform.mb);
+	unsigned int mb = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
+	return snprintf(buf, n, "%s%s\t%u, %u, %u, %u", str, suf, inst.mdform.ra, inst.mdform.rs, sh, mb);
 }
 
 static inline int GetMnemonicMDSFormRARSRBMBRc(char *buf, unsigned int n, inst_t inst, const char *str)

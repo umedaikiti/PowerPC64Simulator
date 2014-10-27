@@ -92,12 +92,15 @@ const char *help =
 		"r <num>: print GPR[<num>]\n"
 		"n: execute next instruction\n"
 		"d: dump all registers\n"
-		"m <size> <address>: print contents of memory\n"
+		"m <size> <address(hex)>: print contents of memory\n"
+		"b <address(hex)>: set breakpoint\n"
+		"c: continue\n"
 		"q: quit\n";
 
 //ユーザーからの入力を受け取り、応答する
-int Command(ppc64_t *ppc, const char* cmd)
+int Command(sim_state_t *state, const char* cmd)
 {
+	ppc64_t *ppc = state->ppc;
 	switch(cmd[0]){
 	case 'h':
 		printf("%s", help);
@@ -139,6 +142,28 @@ int Command(ppc64_t *ppc, const char* cmd)
 			}
 			printf("%02x%c", c, (i % 8 == 7) || (i == size - 1) ? '\n' : ' ');
 		}
+		return 0;
+	}
+	case 'b':
+	{
+		unsigned long long addr;
+		int ret;
+		if((ret = sscanf(cmd, "b %llx", &addr)) != 1){
+			printf("sscanf error: %d\n", ret);
+			return 0;
+		}
+		state->breakpoint_enable = 1;
+		state->breakpoint_addr = addr;
+		printf("set breakpoint at 0x%llx\n", addr);
+		return 0;
+	}
+	case 'c':
+	{
+		if(state->breakpoint_enable == 0){
+			printf("set breakpoint before continue\n");
+			return 0;
+		}
+		state->state = STATE_CONTINUE;
 		return 0;
 	}
 	case 'd':
@@ -261,21 +286,16 @@ int Execute(ppc64_t *ppc, inst_t instruction)
 }
 
 //シミュレーションを実行する関数
-int PowerPC64MainLoop(ppc64_t *ppc)
+int PowerPC64MainLoop(sim_state_t *state)
 {
 	inst_t inst;
 	int error = 0;
+	char buf[128];
+	char mnemonic[512];
+	ppc64_t *ppc = state->ppc;
+	printf("type h for help\n");
 	while(1){
-		char buf[16];
-		char mnemonic[512];
 		int ret = 0;
-		while(ret == 0){
-			printf("\ntype h for help\n> ");
-			fgets(buf, sizeof(buf), stdin);
-			ret = Command(ppc, buf);
-		}
-		if(ret == -1) break;
-		//PrintRegisters(ppc);
 		inst = NextInstruction(ppc);
 		if(inst.raw == 0) break;
 
@@ -283,6 +303,19 @@ int PowerPC64MainLoop(ppc64_t *ppc)
 			strncpy(mnemonic, "mnemonic unknown", sizeof(mnemonic));
 		}
 		printf("0x%llx : %s\n", ppc->cia, mnemonic);
+
+		if(state->state == STATE_CONTINUE && ppc->cia == state->breakpoint_addr)
+		{
+			state->state = STATE_NORMAL;
+			printf(">>> breakpoint <<<\n");
+		}
+
+		while(ret == 0 && state->state == STATE_NORMAL){
+			printf("> ");
+			fgets(buf, sizeof(buf), stdin);
+			ret = Command(state, buf);
+		}
+		if(ret == -1) break;
 
 		error = Execute(ppc, inst);
 		switch(error){
@@ -297,6 +330,7 @@ int PowerPC64MainLoop(ppc64_t *ppc)
 			printf("InvalidInstruction\n");
 			return -2;
 		}
+		state->step_count++;
 	}
 	return 0;
 }

@@ -22,8 +22,19 @@ static inline int setCR(ppc64_t *ppc, int n, unsigned int cr)
 	return 0;
 }
 
+//0で初期化する
+typedef struct {
+	ppc64_t *ppc;
+	unsigned long long step_count;
+	int state;
+	unsigned long long breakpoint_addr;
+	int breakpoint_enable;
+} sim_state_t;
+#define STATE_NORMAL 0
+#define STATE_CONTINUE 1
+
 int InitPPC(ppc64_t *ppc, const char *filename);
 
-int PowerPC64MainLoop(ppc64_t *ppc);
+int PowerPC64MainLoop(sim_state_t *state);
 
 #endif
