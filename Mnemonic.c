@@ -85,6 +85,45 @@ static inline int GetMnemonicDSFormRTDSRA(char *buf, unsigned int n, inst_t inst
 	return snprintf(buf, n, "%s\t%u, %lld(%u)", str, inst.dsform.rt, ds, inst.dsform.ra);
 }
 
+static inline int GetMnemonicXLFormBOBIBHLK(char *buf, unsigned int n, inst_t inst, const char *str)
+{
+	unsigned int bo, bi, bh;
+	char *suf = inst.xlform.lk ? "l" : "";
+	bo = inst.xlform.bt;
+	bi = inst.xlform.ba;
+	bh = inst.xlform.bb & 3;
+	return snprintf(buf, n, "%s%s\t%u, %u, %u", str, suf, bo, bi, bh);
+}
+
+static inline const char* BranchCondition(unsigned int bo, unsigned int bi)
+{
+	if((bo & 0x1c) == 0xc){
+		switch(bi % 4){
+		case 0:
+				return "lt";
+		case 1:
+				return "gt";
+		case 2:
+				return "eq";
+		case 3:
+				return "so";
+		}
+	}
+	if((bo & 0x1c) == 4){
+		switch(bi % 4){
+		case 0:
+				return "ge";
+		case 1:
+				return "le";
+		case 2:
+				return "ne";
+		case 3:
+				return "ns";
+		}
+	}
+	return NULL;
+}
+
 //bufにニーモニックを返す
 //n: bufのサイズ
 int GetMnemonic(char *buf, unsigned int n, inst_t inst)
@@ -165,47 +204,9 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		const char *suf1 = inst.bform.lk ? "l" : "";
 		const char *suf2 = inst.bform.aa ? "a" : "";
 		long long target_address = EXTS16(inst.bform.bd << 2);
-		if((inst.bform.bo & 4) == 4 && (inst.bform.bo & 1) == 0){
-			char *cond = "";
-			unsigned int crn = inst.bform.bi / 4;
-			switch(inst.bform.bi % 4){
-			case 0:
-				if((inst.bform.bo & 2) == 2){
-					cond = "lt";
-					break;
-				}
-				else{
-					cond = "ge";
-					break;
-				}
-			case 1:
-				if((inst.bform.bo & 2) == 2){
-					cond = "gt";
-					break;
-				}
-				else{
-					cond = "le";
-					break;
-				}
-			case 2:
-				if((inst.bform.bo & 2) == 2){
-					cond = "eq";
-					break;
-				}
-				else{
-					cond = "ne";
-					break;
-				}
-			case 3:
-				if((inst.bform.bo & 2) == 2){
-					cond = "so";
-					break;
-				}
-				else{
-					cond = "ns";
-					break;
-				}
-			}
+		const char *cond = BranchCondition(inst.bform.bo, inst.bform.bi);
+		unsigned int crn = inst.bform.bi / 4;
+		if(cond != NULL){
 			return snprintf(buf, n, "b%s%s%s\tcr%u, 0x%llx", cond, suf1, suf2, crn, target_address);
 		}
 		return snprintf(buf, n, "bc%s%s\t%u, %u, 0x%llx", suf1, suf2, inst.bform.bo, inst.bform.bi, target_address);
@@ -370,21 +371,13 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		switch(inst.xlform.xo){
 		case OPCD19_BCLR:
 		{
-			unsigned int bo = inst.xlform.bt;
-			unsigned int bi = inst.xlform.ba;
-			unsigned int bh = inst.xlform.bb & 3;
-			if((bo & 0x14) == 0x14){
+			if((inst.xlform.bt & 0x14) == 0x14){
 				return snprintf(buf, n, "blr");
 			}
-			if(inst.xlform.lk){
-				return snprintf(buf, n, "bclr\t%u, %u, %u", bo, bi, bh);
-			}
-			else{
-				return snprintf(buf, n, "bclrl\t%u, %u, %u", bo, bi, bh);
-			}
+			return GetMnemonicXLFormBOBIBHLK(buf, n, inst, "bclr");
 		}
 		case OPCD19_BCCTR:
-			return -1;
+			return GetMnemonicXLFormBOBIBHLK(buf, n, inst, "bcctr");
 		case OPCD19_CRAND:
 			return GetMnemonicXLFormBTBABB(buf, n, inst, "crand");
 		case OPCD19_CRNAND:
