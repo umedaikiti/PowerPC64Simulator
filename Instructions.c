@@ -1044,7 +1044,14 @@ int stbu(ppc64_t *ppc, inst_t inst)
 }
 int stbux(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	if(inst.xform.ra == 0) return RET_INVALIDINSTRUCTION;
+	unsigned long long ea = ppc->regs.GPR[inst.xform.ra] + ppc->regs.GPR[inst.xform.rb];
+	int err = WriteMemory1(ppc, ea, ppc->regs.GPR[inst.xform.rt] & 0xFF);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.xform.ra] = ea;
+	return RET_SUCCESS;
 }
 int sth(ppc64_t *ppc, inst_t inst)
 {
@@ -1059,7 +1066,14 @@ int sth(ppc64_t *ppc, inst_t inst)
 }
 int sthx(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long b = inst.xform.ra == 0 ? 0 : ppc->regs.GPR[inst.xform.ra];
+	unsigned long long ea = b + ppc->regs.GPR[inst.xform.rb];
+	unsigned short rs = ppc->regs.GPR[inst.xform.rt] & 0xFFFF;
+	int err = WriteMemory2(ppc, ea, rs);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	return RET_SUCCESS;
 }
 int sthu(ppc64_t *ppc, inst_t inst)
 {
@@ -1075,7 +1089,14 @@ int sthu(ppc64_t *ppc, inst_t inst)
 }
 int sthux(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	if(inst.xform.ra == 0) return RET_INVALIDINSTRUCTION;
+	unsigned long long ea = ppc->regs.GPR[inst.xform.ra] + ppc->regs.GPR[inst.xform.rb];
+	int err = WriteMemory2(ppc, ea, ppc->regs.GPR[inst.xform.rt] & 0xFFFF);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.xform.ra] = ea;
+	return RET_SUCCESS;
 }
 int stw(ppc64_t *ppc, inst_t inst)
 {
@@ -1090,7 +1111,14 @@ int stw(ppc64_t *ppc, inst_t inst)
 }
 int stwx(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long b = inst.xform.ra == 0 ? 0 : ppc->regs.GPR[inst.xform.ra];
+	unsigned long long ea = b + ppc->regs.GPR[inst.xform.rb];
+	unsigned int rs = ppc->regs.GPR[inst.xform.rt] & 0xFFFFFFFF;
+	int err = WriteMemory4(ppc, ea, rs);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	return RET_SUCCESS;
 }
 int stwu(ppc64_t *ppc, inst_t inst)
 {
@@ -1106,7 +1134,14 @@ int stwu(ppc64_t *ppc, inst_t inst)
 }
 int stwux(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	if(inst.xform.ra == 0) return RET_INVALIDINSTRUCTION;
+	unsigned long long ea = ppc->regs.GPR[inst.xform.ra] + ppc->regs.GPR[inst.xform.rb];
+	int err = WriteMemory4(ppc, ea, ppc->regs.GPR[inst.xform.rt] & 0xFFFFFFFF);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.xform.ra] = ea;
+	return RET_SUCCESS;
 }
 int std(ppc64_t *ppc, inst_t inst)
 {
@@ -1121,7 +1156,14 @@ int std(ppc64_t *ppc, inst_t inst)
 }
 int stdx(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long b = inst.xform.ra == 0 ? 0 : ppc->regs.GPR[inst.xform.ra];
+	unsigned long long ea = b + ppc->regs.GPR[inst.xform.rb];
+	unsigned long long rs = ppc->regs.GPR[inst.xform.rt];
+	int err = WriteMemory8(ppc, ea, rs);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	return RET_SUCCESS;
 }
 int stdu(ppc64_t *ppc, inst_t inst)
 {
@@ -1137,7 +1179,14 @@ int stdu(ppc64_t *ppc, inst_t inst)
 }
 int stdux(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	if(inst.xform.ra == 0) return RET_INVALIDINSTRUCTION;
+	unsigned long long ea = ppc->regs.GPR[inst.xform.ra] + ppc->regs.GPR[inst.xform.rb];
+	int err = WriteMemory8(ppc, ea, ppc->regs.GPR[inst.xform.rt]);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.xform.ra] = ea;
+	return RET_SUCCESS;
 }
 int lbz(ppc64_t *ppc, inst_t inst)
 {
@@ -1165,7 +1214,7 @@ int lbzx(ppc64_t *ppc, inst_t inst)
 }
 int lbzu(ppc64_t *ppc, inst_t inst)
 {
-	if(inst.dform.ra == 0) return RET_INVALIDINSTRUCTION;
+	if(inst.dform.ra == 0 || inst.dform.ra == inst.dform.rt) return RET_INVALIDINSTRUCTION;
 	unsigned long long ea = ppc->regs.GPR[inst.dform.ra] + EXTS16(inst.dform.imm);
 	unsigned char rt;
 	int err = ReadMemory1(ppc, ea, &rt);
@@ -1215,7 +1264,7 @@ int lhzx(ppc64_t *ppc, inst_t inst)
 }
 int lhzu(ppc64_t *ppc, inst_t inst)
 {
-	if(inst.dform.ra == 0) return RET_INVALIDINSTRUCTION;
+	if(inst.dform.ra == 0 || inst.dform.ra == inst.dform.rt) return RET_INVALIDINSTRUCTION;
 	unsigned long long ea = ppc->regs.GPR[inst.dform.ra] + EXTS16(inst.dform.imm);
 	unsigned short rt;
 	int err = ReadMemory2(ppc, ea, &rt);
@@ -1265,7 +1314,7 @@ int lhax(ppc64_t *ppc, inst_t inst)
 }
 int lhau(ppc64_t *ppc, inst_t inst)
 {
-	if(inst.dform.ra == 0) return RET_INVALIDINSTRUCTION;
+	if(inst.dform.ra == 0 || inst.dform.ra == inst.dform.rt) return RET_INVALIDINSTRUCTION;
 	unsigned long long ea = ppc->regs.GPR[inst.dform.ra] + EXTS16(inst.dform.imm);
 	unsigned short rt;
 	int err = ReadMemory2(ppc, ea, &rt);
@@ -1315,7 +1364,7 @@ int lwzx(ppc64_t *ppc, inst_t inst)
 }
 int lwzu(ppc64_t *ppc, inst_t inst)
 {
-	if(inst.dform.ra == 0) return RET_INVALIDINSTRUCTION;
+	if(inst.dform.ra == 0 || inst.dform.ra == inst.dform.rt) return RET_INVALIDINSTRUCTION;
 	unsigned long long ea = ppc->regs.GPR[inst.dform.ra] + EXTS16(inst.dform.imm);
 	unsigned int rt;
 	int err = ReadMemory4(ppc, ea, &rt);
@@ -1325,7 +1374,6 @@ int lwzu(ppc64_t *ppc, inst_t inst)
 	ppc->regs.GPR[inst.dform.rt] = rt;
 	ppc->regs.GPR[inst.dform.ra] = ea;
 	return RET_SUCCESS;
-	return RET_NOTIMPLEMENTED;
 }
 int lwzux(ppc64_t *ppc, inst_t inst)
 {
@@ -1366,7 +1414,16 @@ int lwax(ppc64_t *ppc, inst_t inst)
 }
 int lwaux(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	if(inst.xform.ra == 0 || inst.xform.ra == inst.xform.rt) return RET_INVALIDINSTRUCTION;
+	unsigned long long ea = ppc->regs.GPR[inst.xform.ra] + ppc->regs.GPR[inst.xform.rb];
+	unsigned int rt;
+	int err = ReadMemory4(ppc, ea, &rt);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.xform.rt] = EXTS32(rt);
+	ppc->regs.GPR[inst.xform.ra] = ea;
+	return RET_SUCCESS;
 }
 int ld(ppc64_t *ppc, inst_t inst)
 {
@@ -1382,15 +1439,41 @@ int ld(ppc64_t *ppc, inst_t inst)
 }
 int ldx(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	unsigned long long b = inst.xform.ra == 0 ? 0 : ppc->regs.GPR[inst.xform.ra];
+	unsigned long long ea = b + ppc->regs.GPR[inst.xform.rb];
+	unsigned long long rt;
+	int err = ReadMemory8(ppc, ea, &rt);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.xform.rt] = rt;
+	return RET_SUCCESS;
 }
 int ldu(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	if(inst.dsform.ra == 0 || inst.dsform.ra == inst.dsform.rt) return RET_INVALIDINSTRUCTION;
+	unsigned long long ea = ppc->regs.GPR[inst.dsform.ra] + EXTS16(inst.dsform.ds << 2);
+	unsigned long long rt;
+	int err = ReadMemory8(ppc, ea, &rt);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.dsform.rt] = rt;
+	ppc->regs.GPR[inst.dsform.ra] = ea;
+	return RET_SUCCESS;
 }
 int ldux(ppc64_t *ppc, inst_t inst)
 {
-	return RET_NOTIMPLEMENTED;
+	if(inst.xform.ra == 0 || inst.xform.ra == inst.xform.rt) return RET_INVALIDINSTRUCTION;
+	unsigned long long ea = ppc->regs.GPR[inst.xform.ra] + ppc->regs.GPR[inst.xform.rb];
+	unsigned long long rt;
+	int err = ReadMemory8(ppc, ea, &rt);
+	if(err != 0){
+		return RET_MEMORYERROR;
+	}
+	ppc->regs.GPR[inst.xform.rt] = rt;
+	ppc->regs.GPR[inst.xform.ra] = ea;
+	return RET_SUCCESS;
 }
 
 static inline unsigned long long mask(unsigned int x, unsigned int y)

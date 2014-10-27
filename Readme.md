@@ -126,19 +126,19 @@ q        | 終了する
 - [x] stb
 - [x] stbx
 - [x] stbu
-- [ ] stbux
+- [x] stbux
 - [x] sth
-- [ ] sthx
+- [x] sthx
 - [x] sthu
-- [ ] sthux
+- [x] sthux
 - [x] stw
-- [ ] stwx
+- [x] stwx
 - [x] stwu
-- [ ] stwux
+- [x] stwux
 - [x] std
-- [ ] stdx
+- [x] stdx
 - [x] stdu
-- [ ] stdux
+- [x] stdux
 - [x] lbz
 - [x] lbzx
 - [x] lbzu
@@ -157,11 +157,11 @@ q        | 終了する
 - [x] lwzux
 - [x] lwa
 - [x] lwax
-- [ ] lwaux
+- [x] lwaux
 - [x] ld
-- [ ] ldx
-- [ ] ldu
-- [ ] ldux
+- [x] ldx
+- [x] ldu
+- [x] ldux
 
 #### Move To/From System Register Instructions
 - [ ] mtspr
