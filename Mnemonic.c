@@ -6,17 +6,17 @@
 
 static inline int GetMnemonicDFormRTRASI(char *buf, unsigned int n, inst_t inst, const char *str)
 {
-	return snprintf(buf, n, "%s\t%u, %u, %lld", str, inst.dform.rt, inst.dform.ra, EXTS16(inst.dform.imm));
+	return snprintf(buf, n, "%s\tr%u, r%u, %lld", str, inst.dform.rt, inst.dform.ra, EXTS16(inst.dform.imm));
 }
 
 static inline int GetMnemonicDFormRARSUI(char *buf, unsigned int n, inst_t inst, const char *str)
 {
-	return snprintf(buf, n, "%s\t%u, %u, 0x%x", str, inst.dform.ra, inst.dform.rt, inst.dform.imm);
+	return snprintf(buf, n, "%s\tr%u, r%u, 0x%x", str, inst.dform.ra, inst.dform.rt, inst.dform.imm);
 }
 
 static inline int GetMnemonicDFormLoadStore(char *buf, unsigned int n, inst_t inst, const char *str)
 {
-	return snprintf(buf, n, "%s\t%u, %lld(%u)", str, inst.dform.rt, EXTS16(inst.dform.imm), inst.dform.ra);
+	return snprintf(buf, n, "%s\tr%u, %lld(r%u)", str, inst.dform.rt, EXTS16(inst.dform.imm), inst.dform.ra);
 }
 
 static inline int GetMnemonicXLFormBTBABB(char *buf, unsigned int n, inst_t inst, const char *str)
@@ -28,42 +28,42 @@ static inline int GetMnemonicXOFormRTRARBOERc(char *buf, unsigned int n, inst_t 
 {
 	const char *suf1 = inst.xoform.oe ? "o" : "";
 	const char *suf2 = inst.xoform.rc ? "." : "";
-	return snprintf(buf, n, "%s%s%s\t%u, %u, %u", str, suf1, suf2, inst.xoform.rt, inst.xoform.ra, inst.xoform.rb);
+	return snprintf(buf, n, "%s%s%s\tr%u, r%u, r%u", str, suf1, suf2, inst.xoform.rt, inst.xoform.ra, inst.xoform.rb);
 }
 
 static inline int GetMnemonicXOFormRTRAOERc(char *buf, unsigned int n, inst_t inst, const char *str)
 {
 	const char *suf1 = inst.xoform.oe ? "o" : "";
 	const char *suf2 = inst.xoform.rc ? "." : "";
-	return snprintf(buf, n, "%s%s%s\t%u, %u", str, suf1, suf2, inst.xoform.rt, inst.xoform.ra);
+	return snprintf(buf, n, "%s%s%s\tr%u, r%u", str, suf1, suf2, inst.xoform.rt, inst.xoform.ra);
 }
 
 static inline int GetMnemonicXFormRARSRBRc(char *buf, unsigned int n, inst_t inst, const char *str)
 {
 	const char *suf = inst.xform.rc ? "." : "";
-	return snprintf(buf, n, "%s%s\t%u, %u, %u", str, suf, inst.xform.ra, inst.xform.rt, inst.xform.rb);
+	return snprintf(buf, n, "%s%s\tr%u, r%u, r%u", str, suf, inst.xform.ra, inst.xform.rt, inst.xform.rb);
 }
 
 static inline int GetMnemonicXFormRARSRc(char *buf, unsigned int n, inst_t inst, const char *str)
 {
 	const char *suf = inst.xform.rc ? "." : "";
-	return snprintf(buf, n, "%s%s\t%u, %u", str, suf, inst.xform.ra, inst.xform.rt);
+	return snprintf(buf, n, "%s%s\tr%u, r%u", str, suf, inst.xform.ra, inst.xform.rt);
 }
 
 static inline int GetMnemonicXFormRARS(char *buf, unsigned int n, inst_t inst, const char *str)
 {
-	return snprintf(buf, n, "%s\t%u, %u", str, inst.xform.ra, inst.xform.rt);
+	return snprintf(buf, n, "%s\tr%u, r%u", str, inst.xform.ra, inst.xform.rt);
 }
 
 static inline int GetMnemonicXFormRTRARB(char *buf, unsigned int n, inst_t inst, const char *str)
 {
-	return snprintf(buf, n, "%s\t%u, %u, %u", str, inst.xform.rt, inst.xform.ra, inst.xform.rb);
+	return snprintf(buf, n, "%s\tr%u, r%u, r%u", str, inst.xform.rt, inst.xform.ra, inst.xform.rb);
 }
 
 static inline int GetMnemonicMFormRARSRBMBMERc(char *buf, unsigned int n, inst_t inst, const char *str)
 {
 	char *suf = inst.mform.rc ? "." : "";
-	return snprintf(buf, n, "%s%s\t%u, %u, %u, %u, %u", str, suf, inst.mform.ra, inst.mform.rs, inst.mform.rb, inst.mform.mb, inst.mform.me);
+	return snprintf(buf, n, "%s%s\tr%u, r%u, r%u, %u, %u", str, suf, inst.mform.ra, inst.mform.rs, inst.mform.rb, inst.mform.mb, inst.mform.me);
 }
 
 static inline int GetMnemonicMDFormRARSSHMBRc(char *buf, unsigned int n, inst_t inst, const char *str)
@@ -71,19 +71,19 @@ static inline int GetMnemonicMDFormRARSSHMBRc(char *buf, unsigned int n, inst_t 
 	char *suf = inst.mdform.rc ? "." : "";
 	unsigned int sh = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
 	unsigned int mb = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
-	return snprintf(buf, n, "%s%s\t%u, %u, %u, %u", str, suf, inst.mdform.ra, inst.mdform.rs, sh, mb);
+	return snprintf(buf, n, "%s%s\tr%u, r%u, %u, %u", str, suf, inst.mdform.ra, inst.mdform.rs, sh, mb);
 }
 
 static inline int GetMnemonicMDSFormRARSRBMBRc(char *buf, unsigned int n, inst_t inst, const char *str)
 {
 	char *suf = inst.mdsform.rc ? "." : "";
-	return snprintf(buf, n, "%s%s\t%u, %u, %u, %u", str, suf, inst.mdsform.ra, inst.mdsform.rs, inst.mdsform.rb, inst.mdsform.mb);
+	return snprintf(buf, n, "%s%s\tr%u, r%u, r%u, %u", str, suf, inst.mdsform.ra, inst.mdsform.rs, inst.mdsform.rb, inst.mdsform.mb);
 }
 
 static inline int GetMnemonicDSFormRTDSRA(char *buf, unsigned int n, inst_t inst, const char *str)
 {
 	long long ds = EXTS16(inst.dsform.ds << 2);
-	return snprintf(buf, n, "%s\t%u, %lld(%u)", str, inst.dsform.rt, ds, inst.dsform.ra);
+	return snprintf(buf, n, "%s\tr%u, %lld(r%u)", str, inst.dsform.rt, ds, inst.dsform.ra);
 }
 
 static inline int GetMnemonicXLFormBOBIBHLK(char *buf, unsigned int n, inst_t inst, const char *str)
@@ -122,6 +122,12 @@ static inline const char* BranchCondition(unsigned int bo, unsigned int bi)
 				return "ns";
 		}
 	}
+	if((bo & 0x12) == 0x10){
+		return "dnz";
+	}
+	if((bo & 0x12) == 0x12){
+		return "dz";
+	}
 	return NULL;
 }
 
@@ -138,12 +144,12 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		return GetMnemonicDFormRTRASI(buf, n, inst, "addic.");
 	case ADDI:
 		if(inst.dform.ra == 0){
-			return snprintf(buf, n, "li\t%u, %lld", inst.dform.rt, EXTS16(inst.dform.imm));
+			return snprintf(buf, n, "li\tr%u, %lld", inst.dform.rt, EXTS16(inst.dform.imm));
 		}
 		return GetMnemonicDFormRTRASI(buf, n, inst, "addi");
 	case ADDIS:
 		if(inst.dform.ra == 0){
-			return snprintf(buf, n, "lis\t%u, %lld", inst.dform.rt, EXTS16(inst.dform.imm));
+			return snprintf(buf, n, "lis\tr%u, %lld", inst.dform.rt, EXTS16(inst.dform.imm));
 		}
 		return GetMnemonicDFormRTRASI(buf, n, inst, "addis");
 	case ANDI:
@@ -196,7 +202,7 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 	{
 		const char *suf1 = inst.iform.lk ? "l" : "";
 		const char *suf2 = inst.iform.aa ? "a" : "";
-		long long target_address = ((unsigned long long)inst.iform.li << 40) >> 38;
+		long long target_address = ((long long)inst.iform.li << 40) >> 38;
 		//オペランドとしてliを直接表示
 		return snprintf(buf, n, "b%s%s\t0x%llx", suf1, suf2, target_address);
 	}
@@ -244,7 +250,7 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 			return GetMnemonicXFormRARSRBRc(buf, n, inst, "and");
 		case OPCD31_X_OR:
 			if(inst.xform.rt == inst.xform.rb){
-				return snprintf(buf, n, "mr\t%u, %u", inst.xform.ra, inst.xform.rb);
+				return snprintf(buf, n, "mr\tr%u, r%u", inst.xform.ra, inst.xform.rb);
 			}
 			return GetMnemonicXFormRARSRBRc(buf, n, inst, "or");
 		case OPCD31_X_XOR:
@@ -253,7 +259,7 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 			return GetMnemonicXFormRARSRBRc(buf, n, inst, "nand");
 		case OPCD31_X_NOR:
 			if(inst.xform.rt == inst.xform.rb){
-				return snprintf(buf, n, "not\t%u, %u", inst.xform.ra, inst.xform.rt);
+				return snprintf(buf, n, "not\tr%u, r%u", inst.xform.ra, inst.xform.rt);
 			}
 			return GetMnemonicXFormRARSRBRc(buf, n, inst, "nor");
 		case OPCD31_X_EQV:
@@ -269,7 +275,7 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		case OPCD31_X_CNTLZW:
 			return GetMnemonicXFormRARSRc(buf, n, inst, "cntlzw");
 		case OPCD31_X_CMPB:
-			return snprintf(buf, n, "cmpb\t%u, %u, %u", inst.xform.ra, inst.xform.rt, inst.xform.rb);
+			return snprintf(buf, n, "cmpb\tr%u, r%u, r%u", inst.xform.ra, inst.xform.rt, inst.xform.rb);
 		case OPCD31_X_POPCNTB:
 			return GetMnemonicXFormRARS(buf, n, inst, "popcntb");
 		case OPCD31_X_POPCNTW:
@@ -300,13 +306,13 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		{
 			unsigned int bf = inst.xform.rt >> 2;
 			unsigned int l = inst.xform.rt & 1;
-			return snprintf(buf, n, "cmp\t%u, %u, %u, %u", bf, l, inst.xform.ra, inst.xform.rb);
+			return snprintf(buf, n, "cmp%s\tcr%u, r%u, r%u", l ? "d" : "w", bf, inst.xform.ra, inst.xform.rb);
 		}
 		case OPCD31_X_CMPL:
 		{
 			unsigned int bf = inst.xform.rt >> 2;
 			unsigned int l = inst.xform.rt & 1;
-			return snprintf(buf, n, "cmpl\t%u, %u, %u, %u", bf, l, inst.xform.ra, inst.xform.rb);
+			return snprintf(buf, n, "cmpl%s\tcr%u, r%u, r%u", l ? "d" : "w", bf, inst.xform.ra, inst.xform.rb);
 		}
 		case OPCD31_X_STBX:
 			return GetMnemonicXFormRTRARB(buf, n, inst, "stbx");
@@ -357,12 +363,12 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		case OPCD31_XFX_MTSPR:
 			{
 				unsigned int spr = ((inst.xfxform.r & 0x1F) << 5) | (inst.xfxform.r >> 5);
-				return snprintf(buf, n, "mtspr\t%u, %u", spr, inst.xfxform.rt);
+				return snprintf(buf, n, "mtspr\t%u, r%u", spr, inst.xfxform.rt);
 			}
 		case OPCD31_XFX_MFSPR:
 			{
 				unsigned int spr = ((inst.xfxform.r & 0x1F) << 5) | (inst.xfxform.r >> 5);
-				return snprintf(buf, n, "mfspr\t%u, %u", inst.xfxform.rt, spr);
+				return snprintf(buf, n, "mfspr\tr%u, %u", inst.xfxform.rt, spr);
 			}
 		default:
 			break;
@@ -374,6 +380,11 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		{
 			if((inst.xlform.bt & 0x14) == 0x14){
 				return snprintf(buf, n, "blr");
+			}
+			const char *cond = BranchCondition(inst.xlform.bt, inst.xlform.ba);
+			unsigned int crn = inst.xlform.ba / 4;
+			if(cond != NULL){
+				return snprintf(buf, n, "b%slr\tcr%u", cond, crn);
 			}
 			return GetMnemonicXLFormBOBIBHLK(buf, n, inst, "bclr");
 		}
@@ -403,8 +414,28 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 	case 30:
 		switch(inst.mdform.xo){
 		case OPCD30_MD_RLDICR:
+		{
+			unsigned int sh = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
+			unsigned int me = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
+			if(sh == 0){
+				return snprintf(buf, n, "clrrdi\tr%u, r%u, %u", inst.mdform.ra, inst.mdform.rs, 63-me);
+			}
+			if(sh + me == 63){
+				return snprintf(buf, n, "sldi\tr%u, r%u, %u", inst.mdform.ra, inst.mdform.rs, sh);
+			}
+		}
 			return GetMnemonicMDFormRARSSHMBRc(buf, n, inst, "rldicr");
 		case OPCD30_MD_RLDICL:
+		{
+			unsigned int sh = inst.mdform.sh1 | (inst.mdform.sh2 << 5);
+			unsigned int mb = (inst.mdform.mb >> 1) | ((inst.mdform.mb & 1) << 5);
+			if(sh == 0){
+				return snprintf(buf, n, "clrldi\tr%u, r%u, %u", inst.mdform.ra, inst.mdform.rs, mb);
+			}
+			if(sh + mb == 64){
+				return snprintf(buf, n, "srdi\tr%u, r%u, %u", inst.mdform.ra, inst.mdform.rs, mb);
+			}
+		}
 			return GetMnemonicMDFormRARSSHMBRc(buf, n, inst, "rldicl");
 		case OPCD30_MD_RLDIC:
 			return GetMnemonicMDFormRARSSHMBRc(buf, n, inst, "rldic");
@@ -445,14 +476,14 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		unsigned int bf = inst.dform.rt >> 2;
 		unsigned int l = inst.dform.rt & 1;
 		short si = inst.dform.imm;
-		return snprintf(buf, n, "cmpi\t%u, %u, %u, %d", bf, l, inst.dform.ra, si);
+		return snprintf(buf, n, "cmp%si\tcr%u, r%u, %d", l ? "d" : "w", bf, inst.dform.ra, si);
 	}
 	case CMPLI:
 	{
 		unsigned int bf = inst.dform.rt >> 2;
 		unsigned int l = inst.dform.rt & 1;
 		unsigned short ui = inst.dform.imm;
-		return snprintf(buf, n, "cmpli\t%u, %u, %u, %u", bf, l, inst.dform.ra, ui);
+		return snprintf(buf, n, "cmpl%si\tcr%u, r%u, %u", l ? "d" : "w", bf, inst.dform.ra, ui);
 	}
 	case RLWINM:
 		return GetMnemonicMFormRARSRBMBMERc(buf, n, inst, "rlwinm");
