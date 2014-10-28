@@ -363,12 +363,30 @@ int GetMnemonic(char *buf, unsigned int n, inst_t inst)
 		case OPCD31_XFX_MTSPR:
 			{
 				unsigned int spr = ((inst.xfxform.r & 0x1F) << 5) | (inst.xfxform.r >> 5);
-				return snprintf(buf, n, "mtspr\t%u, r%u", spr, inst.xfxform.rt);
+				switch(spr){
+				case 1:
+					return snprintf(buf, n, "mtxer\tr%u", inst.xfxform.rt);
+				case 8:
+					return snprintf(buf, n, "mtlr\tr%u", inst.xfxform.rt);
+				case 9:
+					return snprintf(buf, n, "mtctr\tr%u", inst.xfxform.rt);
+				default:
+					return snprintf(buf, n, "mtspr\t%u, r%u", spr, inst.xfxform.rt);
+				}
 			}
 		case OPCD31_XFX_MFSPR:
 			{
 				unsigned int spr = ((inst.xfxform.r & 0x1F) << 5) | (inst.xfxform.r >> 5);
-				return snprintf(buf, n, "mfspr\tr%u, %u", inst.xfxform.rt, spr);
+				switch(spr){
+				case 1:
+					return snprintf(buf, n, "mfxer\tr%u", inst.xfxform.rt);
+				case 8:
+					return snprintf(buf, n, "mflr\tr%u", inst.xfxform.rt);
+				case 9:
+					return snprintf(buf, n, "mfctr\tr%u", inst.xfxform.rt);
+				default:
+					return snprintf(buf, n, "mfspr\tr%u, %u", inst.xfxform.rt, spr);
+				}
 			}
 		default:
 			break;
