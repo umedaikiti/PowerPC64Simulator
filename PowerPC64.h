@@ -18,7 +18,7 @@ static inline int setCR(ppc64_t *ppc, int n, unsigned int cr)
 	unsigned int shift = 4*(7-n);
 	cr &= 0xf;
 	ppc->regs.CR.raw &= ~(0xFull << shift);
-	ppc->regs.CR.raw |= cr << shift;
+	ppc->regs.CR.raw |= (unsigned long long)cr << shift;
 	return 0;
 }
 

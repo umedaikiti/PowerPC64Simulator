@@ -78,12 +78,12 @@ int ReadMemory8(ppc64_t *ppc, unsigned long long address, unsigned long long *da
 #ifndef TARGET_LITTLEENDIAN
 	*data = 0;
 	for(i=0;i<8;i++){
-		*data |= cdata[i] << (8*(7-i));
+		*data |= (unsigned long long)cdata[i] << (8*(7-i));
 	}
 #else
 	*data = 0;
 	for(i=0;i<8;i++){
-		*data |= cdata[i] << (8*i);
+		*data |= (unsigned long long)cdata[i] << (8*i);
 	}
 #endif
 
@@ -101,12 +101,12 @@ int ReadMemory4(ppc64_t *ppc, unsigned long long address, unsigned int *data)
 #ifndef TARGET_LITTLEENDIAN
 	*data = 0;
 	for(i=0;i<4;i++){
-		*data |= cdata[i] << (8*(3-i));
+		*data |= (unsigned int)cdata[i] << (8*(3-i));
 	}
 #else
 	*data = 0;
 	for(i=0;i<4;i++){
-		*data |= cdata[i] << (8*i);
+		*data |= (unsigned int)cdata[i] << (8*i);
 	}
 #endif
 
@@ -122,9 +122,9 @@ int ReadMemory2(ppc64_t *ppc, unsigned long long address, unsigned short *data)
 	}
 
 #ifndef TARGET_LITTLEENDIAN
-	*data = cdata[1] | (cdata[0] << 8);
+	*data = (unsigned short)((unsigned int)cdata[1] | ((unsigned int)cdata[0] << 8));
 #else
-	*data = cdata[0] | (cdata[1] << 8);
+	*data = (unsigned short)((unsigned int)cdata[0] | ((unsigned int)cdata[1] << 8));
 #endif
 
 	return 0;
@@ -149,12 +149,12 @@ int WriteMemory8(ppc64_t *ppc, unsigned long long address, unsigned long long da
 
 #ifndef TARGET_LITTLEENDIAN
 	for(i=0;i<8;i++){
-		cdata[7-i] = data & 0xFF;
+		cdata[7-i] = (unsigned char)(data & 0xFF);
 		data >>= 8;
 	}
 #else
 	for(i=0;i<8;i++){
-		cdata[i] = data & 0xFF;
+		cdata[i] = (unsigned char)(data & 0xFF);
 		data >>= 8;
 	}
 #endif
@@ -172,12 +172,12 @@ int WriteMemory4(ppc64_t *ppc, unsigned long long address, unsigned int data)
 
 #ifndef TARGET_LITTLEENDIAN
 	for(i=0;i<4;i++){
-		cdata[3-i] = data & 0xFF;
+		cdata[3-i] = (unsigned char)(data & 0xFF);
 		data >>= 8;
 	}
 #else
 	for(i=0;i<4;i++){
-		cdata[i] = data & 0xFF;
+		cdata[i] = (unsigned char)(data & 0xFF);
 		data >>= 8;
 	}
 #endif
@@ -194,11 +194,11 @@ int WriteMemory2(ppc64_t *ppc, unsigned long long address, unsigned short data)
 	unsigned char cdata[2];
 
 #ifndef TARGET_LITTLEENDIAN
-	cdata[0] = (data >> 8) & 0xFF;
-	cdata[1] = data & 0xFF;
+	cdata[0] = (unsigned char)((data >> 8) & 0xFF);
+	cdata[1] = (unsigned char)(data & 0xFF);
 #else
-	cdata[0] = data & 0xFF;
-	cdata[1] = (data >> 8) & 0xFF;
+	cdata[0] = (unsigned char)(data & 0xFF);
+	cdata[1] = (unsigned char)((data >> 8) & 0xFF);
 #endif
 
 	err = WriteMemory(ppc, address, cdata, 2);
