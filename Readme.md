@@ -1,7 +1,7 @@
 #PowerPC64Simulator
 
 情報科学基礎実験の課題のPowerPC64のシミュレーター。
-x86_64-linux-gnuのgccに依存するコードを含みます(ちなみに自分はgcc (Ubuntu 4.8.2-19ubuntu1) 4.8.2で動作のテストをしています)。
+x86_64-linux-gnuのgccに依存するコードを含む(ちなみに自分はgcc (Ubuntu 4.8.2-19ubuntu1) 4.8.2で動作のテストをしている)。
 * signed型の算術右シフト
 * ビットフィールドの順序
 * short, int, long longを2, 4, 8バイトの整数型として扱っている
@@ -17,7 +17,7 @@ x86_64-linux-gnuのgccに依存するコードを含みます(ちなみに自分
 ### 使い方
 
 #### アセンブリコードの作り方
-そのうち書く
+testにあるMakefileを参照、というかコピーして必要なとこだけ書き換えればいい
 
 #### シミュレーターの使い方
 ```
@@ -106,10 +106,10 @@ q        | 終了する
 - [ ] rlwimi
 - [x] rldicl
 - [x] rldicr
-- [ ] rldic
-- [ ] rldcl
-- [ ] rldcr
-- [ ] rldimi
+- [x] rldic
+- [x] rldcl
+- [x] rldcr
+- [x] rldimi
 - [x] slw
 - [x] srw
 - [x] srawi
