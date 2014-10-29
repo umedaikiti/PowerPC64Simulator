@@ -19,21 +19,18 @@ typedef struct _memory_t {
 	int page_count;
 } memory_t;
 
-struct _ppc64_t;
-typedef struct _ppc64_t ppc64_t;
+int ReadMemory8(memory_t *memory, unsigned long long address, unsigned long long *data);
+int ReadMemory4(memory_t *memory, unsigned long long address, unsigned int *data);
+int ReadMemory2(memory_t *memory, unsigned long long address, unsigned short *data);
+int ReadMemory1(memory_t *memory, unsigned long long address, unsigned char *data);
 
-int ReadMemory8(ppc64_t *ppc, unsigned long long address, unsigned long long *data);
-int ReadMemory4(ppc64_t *ppc, unsigned long long address, unsigned int *data);
-int ReadMemory2(ppc64_t *ppc, unsigned long long address, unsigned short *data);
-int ReadMemory1(ppc64_t *ppc, unsigned long long address, unsigned char *data);
-
-int WriteMemory8(ppc64_t *ppc, unsigned long long address, unsigned long long data);
-int WriteMemory4(ppc64_t *ppc, unsigned long long address, unsigned int data);
-int WriteMemory2(ppc64_t *ppc, unsigned long long address, unsigned short data);
-int WriteMemory1(ppc64_t *ppc, unsigned long long address, unsigned char data);
+int WriteMemory8(memory_t *memory, unsigned long long address, unsigned long long data);
+int WriteMemory4(memory_t *memory, unsigned long long address, unsigned int data);
+int WriteMemory2(memory_t *memory, unsigned long long address, unsigned short data);
+int WriteMemory1(memory_t *memory, unsigned long long address, unsigned char data);
 
 
-int WriteMemory(ppc64_t *ppc, unsigned long long address, const unsigned char *data, int n);
+int WriteMemory(memory_t *memory, unsigned long long address, const unsigned char *data, int n);
 
 #endif //_MEMORY_H_
 

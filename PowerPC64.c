@@ -32,7 +32,7 @@ int InitPPC(ppc64_t *ppc, const char *filename)
 	close(fd);
 
 	memset(ppc, 0, sizeof(ppc64_t));
-	WriteMemory(ppc, entrypoint, p, buf.st_size);
+	WriteMemory(&ppc->memory, entrypoint, p, buf.st_size);
 	free(p);
 	ppc->cia = entrypoint;
 	ppc->nia = ppc->cia + 4;
@@ -133,7 +133,7 @@ int Command(sim_state_t *state, const char* cmd)
 		}
 		for(i=0;i<size;i++){
 			unsigned char c;
-			if(ReadMemory1(ppc, address+i, &c) != 0){
+			if(ReadMemory1(&ppc->memory, address+i, &c) != 0){
 				printf("\nMemory Read Error @0x%llx\n", address+i);
 				return 0;
 			}
@@ -181,7 +181,7 @@ inst_t NextInstruction(ppc64_t *ppc)
 {
 	inst_t inst;
 	unsigned int data;
-	ReadMemory4(ppc, ppc->cia, &data);
+	ReadMemory4(&ppc->memory, ppc->cia, &data);
 	inst.raw = data;
 	return inst;
 }
